@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رزرواسیون هوشمند هتل بین‌المللی امیران</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #c49a45;
+      --primary-dark: #a37d2e;
+      --navy: #152238;
+      --navy-dark: #0d1624;
+      --bg-light: #f7f9fa;
+      --chat-bubble-user: #152238;
+      --chat-bubble-bot: #ffffff;
+      --text-main: #23272e;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    body {
+      background: #eef2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .chat-launcher {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+      border: 2px solid var(--primary);
+      box-shadow: 0 8px 24px rgba(21, 34, 56, 0.35);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .chat-launcher:hover {
+      transform: scale(1.08);
+      box-shadow: 0 12px 30px rgba(196, 154, 69, 0.4);
+    }
+    .chat-launcher svg {
+      width: 30px;
+      height: 30px;
+      fill: var(--primary);
+    }
+    .chat-widget {
+      position: fixed;
+      bottom: 96px;
+      left: 24px;
+      width: 400px;
+      max-width: calc(100vw - 32px);
+      height: 620px;
+      max-height: calc(100vh - 120px);
+      background: var(--bg-light);
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(196, 154, 69, 0.3);
+      z-index: 99998;
+    }
+    .widget-header {
+      background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--primary);
+    }
+    .hotel-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hotel-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 16px;
+    }
+    .hotel-details h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+    .hotel-details span {
+      font-size: 11px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .hotel-details span::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+    }
+    .messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      max-width: 86%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.65;
+      word-wrap: break-word;
+      white-space: pre-line;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .message.bot {
+      background: var(--chat-bubble-bot);
+      color: var(--text-main);
+      align-self: flex-start;
+      border-bottom-right-radius: 4px;
+      border-left: 3px solid var(--primary);
+    }
+    .message.user {
+      background: var(--chat-bubble-user);
+      color: #ffffff;
+      align-self: flex-end;
+      border-bottom-left-radius: 4px;
+    }
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      align-self: center;
+      font-size: 12px;
+      border: 1px solid #f87171;
+    }
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      background: #fff;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border-left: 3px solid var(--primary);
+      gap: 4px;
+      align-items: center;
+    }
+    .typing-indicator span {
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: blink 1.2s infinite ease-in-out both;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1.1); }
+    }
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 14px;
+      background: #fff;
+      border-top: 1px solid #eef2f5;
+    }
+    .chip-btn {
+      white-space: nowrap;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .widget-footer {
+      padding: 12px 14px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .widget-footer textarea {
+      flex: 1;
+      resize: none;
+      height: 40px;
+      padding: 9px 12px;
+      border-radius: 20px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      outline: none;
+      direction: rtl;
+    }
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-launcher" id="launcherBtn">
+    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>
+  </div>
+  <div class="chat-widget" id="chatWidget">
+    <div class="widget-header">
+      <div class="hotel-info">
+        <div class="hotel-avatar">A</div>
+        <div class="hotel-details">
+          <h4>هتل بین‌المللی امیران</h4>
+          <span>پاسخگوی هوشمند رزرواسیون</span>
+        </div>
+      </div>
+    </div>
+    <div class="messages-area" id="messagesArea">
+      <div class="message bot">با درود و احترام؛ به سامانه هوشمند هتل بین‌المللی امیران نیشابور خوش آمدید. 🌹
+افتخار میزبانی شما را خواهیم داشت؛ چطور می‌توانم در خصوص رزرو واحدها، معرفی امکانات تفریحی و اقامت، راهنمای شما باشم؟</div>
+    </div>
+    <div class="typing-indicator" id="typingIndicator">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="quick-chips">
+      <button class="chip-btn" onclick="sendChip('شرایط و امکانات اتاق‌های دوتخته چیست؟')">اتاق‌های دوتخته</button>
+      <button class="chip-btn" onclick="sendChip('سانس‌های استخر و مجموعه آبی به چه صورت است؟')">مجموعه آبی و استخر</button>
+      <button class="chip-btn" onclick="sendChip('ساعت ورود و خروج هتل چگونه است؟')">ساعت تحویل و تخلیه</button>
+      <button class="chip-btn" onclick="sendChip('شماره‌های تماس و رزرو مستقیم هتل')">تماس با رزرواسیون</button>
+    </div>
+    <div class="widget-footer">
+      <textarea id="chatInput" placeholder="پیام خود را بنویسید..." rows="1"></textarea>
+      <button class="send-btn" id="sendBtn">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+  <script>
+    const SYSTEM_PROMPT = `You are the AI Concierge of Amiran Hotel Nishapur (amirangc.com).
+Always respond in polite, formal Persian (رسم‌الخط روان و نیم‌فاصله‌ها).
+Guide users about rooms, pool timings (50% discount for hotel guests), check-in 14:00, check-out 12:00, and complimentary breakfast.
+Collect check-in/out dates, guest count, and phone number, then refer the final payment step to 09058257173.`;
+
+    const chatMessages = [
+      { role: "system", content: SYSTEM_PROMPT }
+    ];
+    const messagesArea = document.getElementById('messagesArea');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    function appendMessage(text, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${sender}`;
+      msgDiv.innerText = text;
+      messagesArea.appendChild(msgDiv);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    async function handleUserSend() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      appendMessage(text, 'user');
+      chatMessages.push({ role: "user", content: text });
+      chatInput.value = '';
+      typingIndicator.style.display = 'flex';
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: chatMessages,
+            temperature: 0.3
+          })
+        });
+
+        typingIndicator.style.display = 'none';
+        if (!response.ok) {
+          const errText = await response.text();
+          appendMessage(`⚠️ خطا (${response.status}): \n${errText}`, 'error');
+          return;
+        }
+        const data = await response.json();
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+          const botReply = data.choices[0].message.content;
+          appendMessage(botReply, 'bot');
+          chatMessages.push({ role: "assistant", content: botReply });
+        } else {
+          appendMessage("⚠️ پاسخی دریافت نشد.", 'error');
+        }
+      } catch (err) {
+        typingIndicator.style.display = 'none';
+        appendMessage(`⚠️ خطای ارتباط: ${err.message}`, 'error');
+      }
+    }
+
+    sendBtn.addEventListener('click', handleUserSend);
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleUserSend();
+      }
+    });
+
+    function sendChip(text) {
+      chatInput.value = text;
+      handleUserSend();
+    }
+  </script>
+</body>
+</html>
